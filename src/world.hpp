@@ -209,20 +209,20 @@ class World {
       std::vector<std::vector<MultiBodyContactPoint>>& contacts_out,
       const Scalar& restitution, const Scalar& friction) {
     int num_multi_bodies_ = multi_bodies_.size();
-    for (int i = 0; i < num_multi_bodies_; i++) {
+    for (int i = 0; i < num_multi_bodies_; i++) {  // FOR EACH MULTIBODY
       MultiBody* mb_a = multi_bodies_[i];
       int num_links_a = mb_a->links().size();
-      for (int j = i + 1; j < multi_bodies_.size(); j++) {
+      for (int j = i + 1; j < multi_bodies_.size(); j++) {  // FOR EACH PAIR OF MULTIBODIES
         std::vector<ContactPoint<Algebra>> contacts;
 
         MultiBody* mb_b = multi_bodies_[j];
         int num_links_b = mb_b->links().size();
         std::vector<MultiBodyContactPoint> contacts_ab;
-        for (int ii = -1; ii < num_links_a; ii++) {
+        for (int ii = -1; ii < num_links_a; ii++) {  // FOR EACH BODY
           const Transform& world_transform_a = mb_a->get_world_transform(ii);
 
           int num_geoms__a = mb_a->collision_geometries(ii).size();
-          for (int iii = 0; iii < num_geoms__a; iii++) {
+          for (int iii = 0; iii < num_geoms__a; iii++) {  // FOR EACH COLLISION GEOMETRY
             const Geometry* geom_a = mb_a->collision_geometries(ii)[iii];
             Pose pose_a;
             const Transform& local_a = mb_a->collision_transforms(ii)[iii];
@@ -231,11 +231,11 @@ class World {
             pose_a.orientation_ =
                 Algebra::normalize(Algebra::matrix_to_quat(tr_a.rotation));
 
-            for (int jj = -1; jj < num_links_b; jj++) {
+            for (int jj = -1; jj < num_links_b; jj++) {  // FOR EACH PAIR OF BODIES
               const Transform& world_transform_b =
                   mb_b->get_world_transform(jj);
               int num_geoms__b = mb_b->collision_geometries(jj).size();
-              for (int jjj = 0; jjj < num_geoms__b; jjj++) {
+              for (int jjj = 0; jjj < num_geoms__b; jjj++) {  // FOR EACH PAIR OF GEOMETRIES
                 const Geometry* geom_b = mb_b->collision_geometries(jj)[jjj];
                 Pose pose_b;
                 const Transform& local_b = mb_b->collision_transforms(jj)[jjj];
@@ -255,7 +255,7 @@ class World {
                 contacts.resize(0);
                 int numContacts = dispatcher->compute_contacts(
                     geom_a, pose_a, geom_b, pose_b, contacts);
-                for (int c = 0; c < numContacts; c++) {
+                for (int c = 0; c < numContacts; c++) {  // FOR EACH CONTACT
                   MultiBodyContactPoint mb_pt;
                   ContactPoint<Algebra>& pt = mb_pt;
                   pt = contacts[c];
