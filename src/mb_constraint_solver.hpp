@@ -188,7 +188,7 @@ class MultiBodyConstraintSolver {
   // cps: contact points with distances < 0
   // dt : delta time (in seconds)
 
-  virtual void resolve_collision_internal(std::vector<ContactPoint> cps,
+  virtual void resolve_collision_internal(std::vector<ContactPoint>& cps,
                                 const Scalar& dt) {
   
 
@@ -446,9 +446,9 @@ class MultiBodyConstraintSolver {
     // Save forces in contact points
     for (int i = 0; i < n_c; ++i) {
       ContactPoint& cp = cps[i];
-      cp.normal_force = lcp_p[i * 3 + 0]/dt;
-      cp.lateral_friction_force_1 = lcp_p[i * 3 + 1]/dt;
-      cp.lateral_friction_force_2 = lcp_p[i * 3 + 2]/dt;
+      cp.normal_force = lcp_p[i]/dt;
+      cp.lateral_friction_force_1 = lcp_p[n_c + i]/dt;
+      cp.lateral_friction_force_2 = lcp_p[2 * n_c + i]/dt;
     }
 
     if (n_a > 0) {
