@@ -13,8 +13,6 @@ target_link_libraries(pendulum_example_tiny)
 target_compile_definitions(pendulum_example_tiny PRIVATE USE_TINY )
 target_include_directories(pendulum_example_tiny PRIVATE ../src )
 
-
-
 if (Eigen3_FOUND)
 add_executable(pendulum_example_eigen_gui pendulum_example_gui.cpp  ${TDS_HDRS})
 target_link_libraries(pendulum_example_eigen_gui opengl_window Eigen3::Eigen ${CMAKE_DL_LIBS})
@@ -40,6 +38,12 @@ target_link_libraries(inclined_plane_gui  Eigen3::Eigen tinyxml2 opengl_window $
 target_include_directories(inclined_plane_gui PRIVATE ../third_party/tinyobjloader)
 target_include_directories(inclined_plane_gui PRIVATE ../third_party ../src)
 target_compile_definitions(inclined_plane_gui PRIVATE USE_TINY )
+
+add_executable(anymal_tiny anymal.cpp  ${TDS_HDRS})
+target_link_libraries(anymal_tiny Eigen3::Eigen tinyxml2 ${CMAKE_DL_LIBS})
+target_compile_definitions(anymal_tiny PRIVATE USE_TINY )
+target_include_directories(anymal_tiny PRIVATE ../src )
+
 
 endif(Eigen3_FOUND)
 
