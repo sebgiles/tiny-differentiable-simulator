@@ -62,34 +62,49 @@ int main(){
     bodies.emplace_back(&mb);
     auto dispatcher = world.get_collision_dispatcher();
     MultiBodyConstraintSolver<MyAlgebra> mb_solver;
-    mb_solver.pgs_iterations_ = 10;
+    mb_solver.pgs_iterations_ = 50;
 
     // std::cout << "Initialized" << std::endl;
     // std::cout << "Enter to run.";
     // std::cin.get();
 
-    mb.q_[6].set_real(0.55);
+    mb.q_[6].set_real(0.65);
     mb.tau_[0].set_dual(1.);
 
-    // Assign q and qd to state
+    auto qdd_out = mb.qd_;
 
-    auto qd_out = mb.qd_;
-
-    std::clock_t c_start = std::clock();
-
-    forward_kinematics(mb, mb.q(), mb.qd());
-    // Assign input to tau
-
-
-    forward_dynamics(mb, world.get_gravity());
-    integrate_euler_qdd(mb, ts);
 
     auto contacts = world.compute_contacts_multi_body(bodies, &dispatcher);
     auto collisions = mb_solver.resolve_collision2(contacts[0], ts);
-    // qdd_out = [(mb.qd_ - qd_out) / ts for i in range(mb.qd.size())]
-    auto qdd_out = (mb.qd_ - qd_out) / ts;
-    
+
+    int N = 1000;
+
+    std::clock_t c_start = std::clock();
+    for (int i=0; i < N; i++){
+        for (int j=0; j < 18; j++){
+            mb.qd_[j].set_real(0.0);
+            mb.qd_[j].set_dual(0.0);
+        }
+        mb.qd_[i % 18].set_dual(1.0);
+
+
+        auto qd_out = mb.qd_;
+
+        forward_kinematics(mb, mb.q(), mb.qd());
+        // Assign input to mb.tau_
+
+
+        forward_dynamics(mb, world.get_gravity());
+        integrate_euler_qdd(mb, ts);
+
+        contacts = world.compute_contacts_multi_body(bodies, &dispatcher);
+        collisions = mb_solver.resolve_collision2(contacts[0], ts);
+        // qdd_out = [(mb.qd_ - qd_out) / ts for i in range(mb.qd.size())]
+        qdd_out = (mb.qd_ - qd_out) / ts;
+                
+    }
     std::clock_t c_end = std::clock();
+    std::cout << qdd_out[0].real() << '\n';
 
     // for (int i=0; i<18; i++){
     //     auto x = qd_out[i];
@@ -100,10 +115,10 @@ int main(){
     //     std::cout << x.real() << '\t' << x.dual() << std::endl;
     // }
 
-    integrate_euler(mb, ts);
+    // integrate_euler(mb, ts);
 
 
-    double time_elapsed_ms = 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC;
+    double time_elapsed_ms = 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC / N;
     std::cout << "collisions: " << collisions.size() << "\n";
     std::cout << "CPU time used: " << time_elapsed_ms << " ms\n";
     std::cout << "CPU time used: " << c_end-c_start << " clocks\n";
